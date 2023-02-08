@@ -42,7 +42,6 @@ from ros_compatibility.qos import QoSProfile, DurabilityPolicy
 from carla_msgs.msg import CarlaStatus
 from carla_msgs.msg import CarlaEgoVehicleInfo
 
-import ros_numpy
 
 
 
@@ -96,6 +95,7 @@ class Listener(CompatibleNode):
         """
         Callback on collision event
         """
+        print("saving wayopint")
         x = data.pose.pose.position.x
         y = data.pose.pose.position.y
         v = (data.twist.twist.linear.x**2 + data.twist.twist.linear.y**2 )**(1/2)

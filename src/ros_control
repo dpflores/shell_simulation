@@ -91,7 +91,7 @@ from std_msgs.msg import Bool
 
 #PLOTTING
 
-PLOTTING = False
+PLOTTING = True
 
 
 """
@@ -119,7 +119,7 @@ PLOT_BOT           = 0.1
 PLOT_WIDTH         = 0.8
 PLOT_HEIGHT        = 0.8
 
-WAYPOINTS_FILENAME = '/home/del/Del/CARLA/ROSCarla/catkin_ws/shell_waypoints.txt'  # waypoint file to load
+WAYPOINTS_FILENAME = '/home/carlasim/TesisDD/carla-ros-bridge/catkin_ws/src/shell_simulation/src/shell_waypoints.txt'  # waypoint file to load
 DIST_THRESHOLD_TO_LAST_WAYPOINT = 2.0  # some distance from last position before
                                        # simulatio1 ends
 

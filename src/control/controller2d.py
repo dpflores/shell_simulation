@@ -12,7 +12,7 @@ import numpy as np
 class Controller2D(object):
     def __init__(self, waypoints):
         self.vars                   = cutils.CUtils()
-        self._lookahead_distance    = 2.0
+        self._lookahead_distance    = 20.0
         self._current_x             = 0
         self._current_y             = 0
         self._current_yaw           = 0
