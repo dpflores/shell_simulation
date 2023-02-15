@@ -97,9 +97,9 @@ PLOTTING = True
 """
 Configurable params
 """
-ITER_FOR_SIM_TIMESTEP  = 150     # no. iterations to compute approx sim timestep
+ITER_FOR_SIM_TIMESTEP  = 10     # no. iterations to compute approx sim timestep
 WAIT_TIME_BEFORE_START = 1.00   # game seconds (time before controller start)
-TOTAL_RUN_TIME         = 100.00 # game seconds (total runtime before sim end)
+TOTAL_RUN_TIME         = 300.00 # game seconds (total runtime before sim end)
 TOTAL_FRAME_BUFFER     = 300    # number of frames to buffer after total runtime
 NUM_PEDESTRIANS        = 0      # total number of pedestrians to spawn
 NUM_VEHICLES           = 2      # total number of vehicles to spawn
@@ -118,15 +118,14 @@ PLOT_LEFT          = 0.1    # in fractions of figure width and height
 PLOT_BOT           = 0.1    
 PLOT_WIDTH         = 0.8
 PLOT_HEIGHT        = 0.8
-
 WAYPOINTS_FILENAME = '/home/carlasim/TesisDD/carla-ros-bridge/catkin_ws/src/shell_simulation/src/shell_waypoints.txt'  # waypoint file to load
 DIST_THRESHOLD_TO_LAST_WAYPOINT = 2.0  # some distance from last position before
                                        # simulatio1 ends
 
 # Path interpolation parameters
-INTERP_MAX_POINTS_PLOT    = 10   # number of points used for displaying
+INTERP_MAX_POINTS_PLOT    = 15   # number of points used for displaying
                                  # lookahead path
-INTERP_LOOKAHEAD_DISTANCE = 20   # lookahead in meters
+INTERP_LOOKAHEAD_DISTANCE = 15   # lookahead in meters
 INTERP_DISTANCE_RES       = 0.01 # distance between interpolated points
 
 # controller output directory
@@ -140,7 +139,7 @@ global speed_glob
 
 global sim_time_glob
 # CAMBIAR ESTO DE ACUERDO AL MAPA
-x_glob, y_glob, z_glob = 29.22999954,-16.000023,0
+x_glob, y_glob, z_glob = -176.6, 4.0, 0.0
 roll_glob, pitch_glob, yaw_glob = 180,180,0
 sim_time_glob=0
 speed_glob=0
@@ -457,12 +456,13 @@ class ShellControl(object):
         # #print(waypoints, "\n\n\n\n\n\n\n")
         waypoints_file = WAYPOINTS_FILENAME
         waypoints_np   = None
-        #with open(waypoints_file) as waypoints_file_handle:
-        #	waypoints = list(csv.reader(waypoints_file_handle,delimiter=',',quoting=csv.QUOTE_NONNUMERIC))
-        
-        #waypoints_np = np.array(waypoints)
-        waypoints_np = np.load("/home/carlasim/TesisDD/carla-ros-bridge/catkin_ws/src/shell_simulation/src/waypoints.npy")
-        waypoints = list(waypoints_np)
+        with open(waypoints_file) as waypoints_file_handle:
+            waypoints = list(csv.reader(waypoints_file_handle,delimiter=',',quoting=csv.QUOTE_NONNUMERIC))
+
+        waypoints_np = np.array(waypoints)
+
+        #waypoints_np = np.load("/home/carlasim/TesisDD/carla-ros-bridge/catkin_ws/src/shell_simulation/src/waypoints.npy")
+        #waypoints = list(waypoints_np)
         # print(waypoints_np)
         # Because the waypoints are discrete and our controller performs better
         # with a continuous path, here we will send a subset of the waypoints
@@ -511,7 +511,7 @@ class ShellControl(object):
             num_pts_to_interp = int(np.floor(wp_distance[i] /\
                                             float(INTERP_DISTANCE_RES)) - 1)
             wp_vector = waypoints_np[i+1] - waypoints_np[i]
-            wp_uvector = wp_vector / np.linalg.norm(wp_vector)
+            wp_uvector = wp_vector / (np.linalg.norm(wp_vector)+0.0001)
             for j in range(num_pts_to_interp):
                 next_wp_vector = INTERP_DISTANCE_RES * float(j+1) * wp_uvector
                 wp_interp.append(list(waypoints_np[i] + next_wp_vector))
@@ -724,6 +724,7 @@ class ShellControl(object):
                     waypoints_np[closest_index, 0] - current_x,
                     waypoints_np[closest_index, 1] - current_y]))
             new_distance = closest_distance
+            print(closest_distance)
             new_index = closest_index
             while new_distance <= closest_distance:
                 closest_distance = new_distance
@@ -771,7 +772,8 @@ class ShellControl(object):
                     wp_interp[wp_interp_hash[waypoint_subset_first_index]:\
                                 wp_interp_hash[waypoint_subset_last_index] + 1]
             controller.update_waypoints(new_waypoints)
-
+            
+            
             # Update the other controller values and controls
             controller.update_values(current_x, current_y, current_yaw, 
                                         current_speed,
@@ -792,6 +794,7 @@ class ShellControl(object):
                     # (INTERP_MAX_POINTS_PLOT amount of points). This is meant
                     # to decrease load when live plotting
                     new_waypoints_np = np.array(new_waypoints)
+                    print(new_waypoints_np)
                     path_indices = np.floor(np.linspace(0, 
                                                         new_waypoints_np.shape[0]-1,
                                                         INTERP_MAX_POINTS_PLOT))
